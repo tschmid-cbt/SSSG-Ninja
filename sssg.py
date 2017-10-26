@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # site shield security group master
 # 28/11/2016 version 1.0 by Jackie Chen
+# 26/10/2017 modified for lambda by Troy Schmid
 
 import os
 import sys
@@ -10,15 +11,15 @@ import logging
 import siteshield
 import securitygroup
 
-base_url = os.environ['SS_BASEURL']
-client_token = os.environ['SS_CLIENTTOKEN']
-client_secret = os.environ['SS_CLIENTSECRET']
-access_token = os.environ['SS_ACCESSTOKEN']
+base_url = 'CHANGE-ME'
+client_token = 'CHANGE-ME'
+client_secret = 'CHANGE-ME'
+access_token = 'CHANGE-ME'
 ss_client = siteshield.Client(base_url, client_token, client_secret, access_token)
 
-siteshield_map_ids = ['1000', '1001']
-siteshield_sg_groups = ['sg-672b3203', 'sg-792b321d', 'sg-552b3231', 'sg-262b3242']
-trusted_cidr = ['51.51.51.51/32', '52.52.52.52/32']
+siteshield_map_ids = ['CHANGE-ME']
+siteshield_sg_groups = ['CHANGE-ME', 'CHANGE-ME']
+trusted_cidr = ['']
 
 current_cidr = list()
 proposed_cidr = list()
@@ -33,9 +34,6 @@ total_empty_slots = 0
 logger = logging.getLogger('__name__')
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
-handler = logging.FileHandler('log')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 formatter_console = logging.Formatter('%(message)s')
@@ -317,59 +315,16 @@ def sssg_advisor():
         logger.info(recomm)
 
 
-def sssg_main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--advisor', help='make recommedations based on current settings',
-                        action='store_true')
-    parser.add_argument('-d', '--debug', help='enable debug logging mode',
-                        action='store_true')
-    parser.add_argument('-i', '--mapinfo', help='get site shield map name and id',
-                        action='store_true')
-    parser.add_argument('-k', '--acknowledge', help='acknowledge site shield updates. Warning: ensure you update'
-                                                    ' security groups before acknowledge', action='store_true')
-    parser.add_argument('-m', '--missed', help='add missed site shield cidr to security groups',
-                        action='store_true')
-    parser.add_argument('-n', '--new', help='add new site shield cidr to security groups',
-                        action='store_true')
-    parser.add_argument('-o', '--obsolete', help='remove obsolete site shield cidr from security groups',
-                        action='store_true')
-    parser.add_argument('-s', '--search', metavar='cidr', help='find security group that contains this cidr'
-                                                               ' (e.g 23.50.48.0/20)')
+def event_handler(event, context):
+    sssg_advisor()
+    get_map_info()
+    health_check()
+    remove_obsolete_cidr()
+    add_missed_cidr()
+    add_new_cidr()
+    ack_proposed_cidr(siteshield_map_ids)
 
-    args = parser.parse_args()
-    if args.advisor:
-        if args.debug:
-            logger.setLevel(logging.DEBUG)
-        health_check()
-        get_cidr_info()
-        sssg_advisor()
-    if args.mapinfo:
-        get_map_info()
-    if args.acknowledge:
-        if args.debug:
-            logger.setLevel(logging.DEBUG)
-        health_check()
-        ack_proposed_cidr(siteshield_map_ids)
-    if args.missed:
-        if args.debug:
-            logger.setLevel(logging.DEBUG)
-        health_check()
-        add_missed_cidr()
-    if args.obsolete:
-        if args.debug:
-            logger.setLevel(logging.DEBUG)
-        health_check()
-        remove_obsolete_cidr()
-    if args.new:
-        if args.debug:
-            logger.setLevel(logging.DEBUG)
-        health_check()
-        add_new_cidr()
-    if args.search:
-        find_ingress_cidr(siteshield_sg_groups, args.search)
-
-
-sssg_main()
+event_handler('sssg', 'lambda')
 
 
 

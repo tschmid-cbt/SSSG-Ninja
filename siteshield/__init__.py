@@ -5,7 +5,7 @@
 import requests
 import json
 from akamai.edgegrid import EdgeGridAuth
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 
 class Client(object):

@@ -1,0 +1,17 @@
+../akamai/edgegrid/__init__.py
+../akamai/edgegrid/edgegrid.py
+../akamai/edgegrid/edgerc.py
+../akamai/edgegrid/test/__init__.py
+../akamai/edgegrid/test/test_edgegrid.py
+../akamai/edgegrid/__pycache__/__init__.cpython-36.pyc
+../akamai/edgegrid/__pycache__/edgegrid.cpython-36.pyc
+../akamai/edgegrid/__pycache__/edgerc.cpython-36.pyc
+../akamai/edgegrid/test/__pycache__/__init__.cpython-36.pyc
+../akamai/edgegrid/test/__pycache__/test_edgegrid.cpython-36.pyc
+dependency_links.txt
+namespace_packages.txt
+PKG-INFO
+requires.txt
+SOURCES.txt
+top_level.txt
+../edgegrid_python-1.0.10-py3.6-nspkg.pth
